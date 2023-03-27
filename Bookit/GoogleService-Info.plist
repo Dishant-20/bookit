@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>609861183896-82f2lr1hl115k62g72cjd5sfdqrcu3ba.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.609861183896-82f2lr1hl115k62g72cjd5sfdqrcu3ba</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>609861183896-d9hao0rjlc80aufrpvmrn3q5oo27lcon.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD2SDBoP3j0NDwaRwmqOnWv24wkijnZFmU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>609861183896</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.production.bookit</string>
+	<key>PROJECT_ID</key>
+	<string>bookit-1b678</string>
+	<key>STORAGE_BUCKET</key>
+	<string>bookit-1b678.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:609861183896:ios:5a88aea597325823fee3ed</string>
+</dict>
+</plist>

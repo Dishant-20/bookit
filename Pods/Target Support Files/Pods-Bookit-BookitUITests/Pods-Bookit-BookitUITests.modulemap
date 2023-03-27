@@ -1,0 +1,6 @@
+framework module Pods_Bookit_BookitUITests {
+  umbrella header "Pods-Bookit-BookitUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}

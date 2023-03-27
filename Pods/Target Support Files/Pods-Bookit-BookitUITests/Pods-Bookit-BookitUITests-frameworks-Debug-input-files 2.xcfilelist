@@ -1,0 +1,10 @@
+${PODS_ROOT}/Target Support Files/Pods-Bookit-BookitUITests/Pods-Bookit-BookitUITests-frameworks.sh
+${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework
+${BUILT_PRODUCTS_DIR}/BSImagePicker/BSImagePicker.framework
+${BUILT_PRODUCTS_DIR}/FSCalendar/FSCalendar.framework
+${BUILT_PRODUCTS_DIR}/GrowingTextView/GrowingTextView.framework
+${BUILT_PRODUCTS_DIR}/OpalImagePicker/OpalImagePicker.framework
+${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework
+${BUILT_PRODUCTS_DIR}/SPConfetti/SPConfetti.framework
+${BUILT_PRODUCTS_DIR}/SwiftGifOrigin/SwiftGifOrigin.framework
+${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework
