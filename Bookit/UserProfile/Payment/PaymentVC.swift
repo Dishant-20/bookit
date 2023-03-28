@@ -374,6 +374,7 @@ class PaymentVC: UIViewController,UITextFieldDelegate {
             if self.is_full_payment_status == "2" {
                 
                 str_advance_payment_is = String(self.str_my_advance_payment_is)
+                
             } else {
                 
                 str_advance_payment_is = "0"

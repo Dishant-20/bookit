@@ -1009,7 +1009,9 @@ class AddTableVC: UIViewController,UIImagePickerControllerDelegate, UINavigation
         self.view.endEditing(true)
         
         // let dummyList = ["20" , "30" , "40" , "50" , "60" , "70" , "80"]
+        
         let dummyList = ["20"]
+        
         RPicker.selectOption(title: "Advance ( % )", cancelText: "Cancel", dataArray: dummyList, selectedIndex: 0) {[] (selctedText, atIndex) in
             
             cell.txt_advance_percentage.text = "\(selctedText)%"

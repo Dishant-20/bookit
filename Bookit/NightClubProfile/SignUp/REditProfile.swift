@@ -173,7 +173,11 @@ class REditProfile: UIViewController, UITextFieldDelegate, UINavigationControlle
                 self.btnEditYourBusinessProfile.isHidden = false
                 btnEditYourBusinessProfile.addTarget(self, action: #selector(editYourBusinessProfileClickMethod), for: .touchUpInside)
             } else {
-                self.btnEditYourBusinessProfile.isHidden = true
+                
+                self.btnEditYourBusinessProfile.isHidden = false
+                self.btnEditYourBusinessProfile.setTitle("Update more details", for: .normal)
+                self.btnEditYourBusinessProfile.addTarget(self, action: #selector(edit_member_details_click_method), for: .touchUpInside)
+                
             }
             
             self.txtRestaurantName.text = (person["fullName"] as! String)
@@ -181,7 +185,7 @@ class REditProfile: UIViewController, UITextFieldDelegate, UINavigationControlle
             self.txtPhone.text = (person["contactNumber"] as! String)
             self.txtAddress.text = (person["address"] as! String)
             
-            imgProfile.sd_setImage(with: URL(string: (person["image"] as! String)), placeholderImage: UIImage(named: "user"))
+            self.imgProfile.sd_setImage(with: URL(string: (person["image"] as! String)), placeholderImage: UIImage(named: "user"))
             
             
             
@@ -205,6 +209,12 @@ class REditProfile: UIViewController, UITextFieldDelegate, UINavigationControlle
         
         self.navigationController?.setNavigationBarHidden(true, animated: true)
         
+    }
+    
+    @objc func edit_member_details_click_method() {
+        let settingsVCId = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "customer_complete_profile_id") as? customer_complete_profile
+        settingsVCId!.str_edit_profile = "yes"
+        self.navigationController?.pushViewController(settingsVCId!, animated: true)
     }
     
     @objc func iAmHereForLocationPermission() {

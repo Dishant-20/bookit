@@ -136,9 +136,20 @@ class WelcomeVC: UIViewController , CLLocationManagerDelegate {
 
                 if "\(person["emailVerify"]!)" != "0" {
                  
-                    let tab_bar = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "tab_bar_controller_id") as? tab_bar_controller
-                    tab_bar?.selectedIndex = 0
-                    self.navigationController?.pushViewController(tab_bar!, animated: false)
+                    if (person["address"] as! String) == "" {
+                        
+                        let settingsVCId = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "customer_complete_profile_id") as? customer_complete_profile
+                        
+                        settingsVCId!.str_edit_profile = "no"
+                        
+                        self.navigationController?.pushViewController(settingsVCId!, animated: true)
+                        
+                    } else {
+                        let tab_bar = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "tab_bar_controller_id") as? tab_bar_controller
+                        tab_bar?.selectedIndex = 0
+                        self.navigationController?.pushViewController(tab_bar!, animated: false)
+                    }
+                    
                     
                 } else {
                     

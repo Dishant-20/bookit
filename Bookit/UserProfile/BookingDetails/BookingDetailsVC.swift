@@ -9,6 +9,8 @@ import UIKit
 import SDWebImage
 import Alamofire
 
+import PassKit
+
 class BookingDetailsVC: UIViewController {
     
     var dict_get_booking_details:NSDictionary!
@@ -68,7 +70,8 @@ class BookingDetailsVC: UIViewController {
         }
     }
 
-    
+    var str_pending_amount_to_pay:String!
+    var str_save_booking_id_for_pending_payment:String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -198,11 +201,13 @@ class BookingDetailsVC: UIViewController {
             
             
             
-            
+            // as
             let get_pending_amount = Double(total_amount_get)!-Double("\(advance_payment_get!)")!
             print(get_pending_amount as Any)
             
             self.btnPay.setTitle("Pending Amount : $\(get_pending_amount)", for: .normal)
+            self.str_pending_amount_to_pay = "\(get_pending_amount)"
+            
             self.btnPay.isUserInteractionEnabled = true
             
             
@@ -376,6 +381,233 @@ class BookingDetailsVC: UIViewController {
     }
     
 
+    //MARK: - PAY PENDING PAYMENT -
+    @objc func pay_pending_payment_wb() {
+        
+        // self.view.endEditing(true)
+        // ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+        
+        if let person = UserDefaults.standard.value(forKey: "keyLoginFullData") as? [String:Any] {
+            // print(person as Any)
+            
+            let x : Int = person["userId"] as! Int
+            let myString = String(x)
+             
+            let params = pay_pending_payment(action: "remainpaymentupdate",
+                                             userId: String(myString),
+                                             bookingId: String(self.str_save_booking_id_for_pending_payment),
+                                             fullPaymentStatus: "1",
+                                             remainPayment:String(self.str_pending_amount_to_pay),
+                                             remainTransactionID:String("cwa_payment"))
+            
+            print(params as Any)
+            
+            AF.request(APPLICATION_BASE_URL,
+                       method: .post,
+                       parameters: params,
+                       encoder: JSONParameterEncoder.default).responseJSON { response in
+                // debugPrint(response.result)
+                
+                switch response.result {
+                case let .success(value):
+                    
+                    let JSON = value as! NSDictionary
+                    print(JSON as Any)
+                    
+                    var strSuccess : String!
+                    strSuccess = (JSON["status"]as Any as? String)?.lowercased()
+                    print(strSuccess as Any)
+                    if strSuccess == String("success") {
+                        print("yes")
+                        
+                        ERProgressHud.sharedInstance.hide()
+                        
+                        var strSuccess2 : String!
+                        strSuccess2 = JSON["msg"]as Any as? String
+                        
+                        let alert = NewYorkAlertController(title: "Success", message: String(strSuccess2), style: .alert)
+                        
+                        alert.addImage(UIImage.gif(name: "success3"))
+                        
+                        let cancel = NewYorkButton(title: "Ok", style: .cancel) { _ in
+                            
+                            self.navigationController?.popViewController(animated: true)
+                            /*let tab_bar = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "tab_bar_controller_id") as? tab_bar_controller
+                            tab_bar?.selectedIndex = 1
+                            self.navigationController?.pushViewController(tab_bar!, animated: false)*/
+                            
+                        }
+                        alert.addButtons([cancel])
+                        
+                        self.present(alert, animated: true)
+                        
+                        /*var get_transaction_id : String!
+                        get_transaction_id = JSON["transactionID"]as Any as? String
+                        
+                        self.update_payment_after_stripe(str_booking_id: String(myString_2),
+                                                         str_payment_Status: "1",
+                                                         str_status_is:"no",
+                                                         str_transaction_id: String(get_transaction_id))*/
+                        
+                        
+                    } else {
+                        print("no")
+                          ERProgressHud.sharedInstance.hide()
+                        
+                        var strSuccess2 : String!
+                        strSuccess2 = JSON["msg"]as Any as? String
+                        
+                        if strSuccess2 == "Your Account is Inactive. Please contact admin.!!" ||
+                            strSuccess2 == "Your Account is Inactive. Please contact admin.!" ||
+                            strSuccess2 == "Your Account is Inactive. Please contact admin." {
+                            
+                            
+                        } else {
+                            
+                            let alert = UIAlertController(title: String(strSuccess).uppercased(), message: String(strSuccess2), preferredStyle: .alert)
+                            
+                            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+                            
+                            self.present(alert, animated: true)
+                            
+                        }
+                    }
+                    
+                case let .failure(error):
+                    print(error)
+                    ERProgressHud.sharedInstance.hide()
+                    
+                    // Utils.showAlert(alerttitle: SERVER_ISSUE_TITLE, alertmessage: SERVER_ISSUE_MESSAGE, ButtonTitle: "Ok", viewController: self)
+                }
+            }
+        }
+    }
+    
+    //
+    @objc func apple_pay_in_bookit(
+        str_club_name:String,str_table_name:String,str_table_price:String) {
+        
+            // self.payment_for_apple_pay = String(str_table_price)
+            // print(self.payment_for_apple_pay as Any)
+            
+            let paymentItem = PKPaymentSummaryItem.init(label: str_club_name+"\n"+str_table_name, amount: NSDecimalNumber(value: str_table_price.toDouble()!))
+        
+        // for cards
+            let paymentNetworks = [PKPaymentNetwork.amex, .discover, .masterCard, .visa]
+        
+        // check user did payment
+            if PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: paymentNetworks) {
+            
+            // if user make payment
+            let request = PKPaymentRequest()
+            request.currencyCode = "USD" // 1
+            request.countryCode = "US" // 2
+                // request.merchantIdentifier = "merchant.com.development.bookit" // 3
+            request.merchantIdentifier = "merchant.com.development.info.bookit" // 3
+
+            request.merchantCapabilities = PKMerchantCapability.capability3DS // 4
+            request.supportedNetworks = paymentNetworks // 5
+            request.paymentSummaryItems = [paymentItem] // 6
+            
+            
+            guard let paymentVC = PKPaymentAuthorizationViewController(paymentRequest: request) else {
+                displayDefaultAlert(title: "Error", message: "Unable to present Apple Pay authorization.")
+                return
+            }
+            paymentVC.delegate = self
+            self.present(paymentVC, animated: true, completion: nil)
+
+        } else {
+            displayDefaultAlert(title: "Error", message: "Unable to make Apple Pay transaction.")
+        }
+        
+    }
+    
+    func displayDefaultAlert(title: String?, message: String?) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+       let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+        alert.addAction(okAction)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    // CWA
+    @objc func payment_via_cwa(payment_to_cwa:String) {
+        ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+        
+        let myDouble = Double(payment_to_cwa)
+        
+        let url = URL(string: "https://cwamerchantservices.transactiongateway.com/api/transact.php")!
+        var request = URLRequest(url: url)
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpMethod = "POST"
+        
+        let parameters: [String: Any] = [
+                                        "zip":"77777",
+                                        "country":"India",
+                                        "amount":myDouble!,// as Double,
+                                       "firstname":"Dishant",
+                                       "cvv":"746",
+                                       "city":"Delhi",
+                                       "address1":"888",
+                                       "type":"sale",
+                                       "lastname":"Rajput",
+//                                       "security_key":"6457Thfj624V5r7WUwc5v6a68Zsd6YEm",
+                                       "security_key":"rzv73u6neV6sNdWH7r22q5WGJU3a9Q6T",
+                                       "phone":"8287632340",
+                                       "state":"Delhi",
+                                       "ccexp":"0909",
+                                       "ccnumber":"4111111111111111"
+        ]
+        
+        request.httpBody = parameters.percentEncoded()
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard
+                let data = data,
+                let response = response as? HTTPURLResponse,
+                error == nil
+            else {                                                               // check for fundamental networking error
+                print("error", error ?? URLError(.badServerResponse))
+                return
+            }
+            
+            guard (200 ... 299) ~= response.statusCode else {                    // check for http errors
+                print("statusCode should be 2xx, but is \(response.statusCode)")
+                print("response = \(response)")
+                return
+            }
+            
+            // do whatever you want with the `data`, e.g.:
+            
+            do {
+                let responseObject = try JSONDecoder().decode(ResponseObject<Foo>.self, from: data)
+                print(responseObject)
+            } catch {
+                print(error) // parsing error
+                
+                if let responseString = String(data: data, encoding: .utf8) {
+                     print("responseString = \(responseString)")
+                    
+                    // send data to evs server
+                    // self.book_a_table_wb(advanced_payment: myDouble!)
+                    self.pay_pending_payment_wb()
+                    //
+                } else {
+                    print("unable to parse response as string")
+                }
+            }
+        }
+
+        task.resume()
+        
+        // delete this after uncomment
+        /*let myDouble = Double(payment_to_cwa)
+        self.book_a_table_wb(advanced_payment: myDouble!)*/
+        
+    }
+    
+    
 }
 
 //MARK:- TABLE VIEW -
@@ -499,24 +731,31 @@ extension BookingDetailsVC: UITableViewDataSource {
         
         print("open action sheet")
         
-        let actionSheet = NewYorkAlertController(title: "Pending Payment", message: "test", style: .actionSheet)
+        let actionSheet = NewYorkAlertController(title: "Pending Payment", message: "Pay :$"+self.str_pending_amount_to_pay, style: .actionSheet)
         
         actionSheet.addImage(UIImage(named: "payment_1"))
         
+         print(self.dict_get_booking_details as Any)
+        // bookingId
         let apple_pay = NewYorkButton(title: "Apple Pay", style: .default) { _ in
             // print("camera clicked done")
 
-            /*self.apple_pay_in_bookit(str_club_name: club_name,
-                                     str_table_name: table_name,
-                                     str_table_price: final_pay_to_club)*/
+            self.str_save_booking_id_for_pending_payment = "\(self.dict_get_booking_details["bookingId"]!)"
+            
+            
+            
+             
+            self.apple_pay_in_bookit(str_club_name: self.dict_get_booking_details["ClubfullName"] as! String,
+                                     str_table_name: self.dict_get_booking_details["tableName"] as! String,
+                                     str_table_price: String(self.str_pending_amount_to_pay))
             
          }
         
         let cwd_payment = NewYorkButton(title: "CWA", style: .default) { _ in
             // print("camera clicked done")
 
-             
-            // self.payment_via_cwa(payment_to_cwa: final_pay_to_club)
+            self.str_save_booking_id_for_pending_payment = "\(self.dict_get_booking_details["bookingId"]!)"
+            self.payment_via_cwa(payment_to_cwa: self.str_pending_amount_to_pay)
             
          }
                                 
@@ -583,4 +822,41 @@ extension Double {
         let divisor = pow(10.0, Double(places))
         return (self * divisor).rounded() / divisor
     }
+}
+
+extension BookingDetailsVC: PKPaymentAuthorizationViewControllerDelegate {
+    func paymentAuthorizationViewControllerDidFinish(_ controller: PKPaymentAuthorizationViewController) {
+        
+        //
+        dismiss(animated: true, completion: nil)
+        //
+    }
+    
+    func paymentAuthorizationViewController(_ controller: PKPaymentAuthorizationViewController, didAuthorizePayment payment: PKPayment, handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
+        
+        dismiss(animated: true, completion: nil)
+        
+        print("The Apple Pay transaction was complete.")
+        
+        print(payment.token.paymentData)
+        print(payment.token.paymentMethod)
+        print(payment.token.transactionIdentifier)
+        
+        if let url = Bundle.main.appStoreReceiptURL,
+           let data = try? Data(contentsOf: url) {
+              let receiptBase64 = data.base64EncodedString()
+              // Send to server
+            print(receiptBase64)
+        }
+        
+        // displayDefaultAlert(title: "Success!", message: "The Apple Pay transaction was complete.")
+        
+        // call webservice
+        ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+        self.pay_pending_payment_wb()
+        
+        
+    }
+    
+ 
 }

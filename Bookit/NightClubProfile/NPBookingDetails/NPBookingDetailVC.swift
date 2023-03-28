@@ -208,13 +208,20 @@ extension NPBookingDetailVC: UITableViewDataSource {
         
         
         if (self.dict_get_club_booking_details["fullPaymentStatus"] as! Int) == 1 {
-            btnPay.setTitle("PAYMENT DONE", for: .normal)
+            
+            self.btnPay.setTitle("PAYMENT DONE", for: .normal)
         } else {
             
             let temp:NSNumber = self.dict_get_club_booking_details["advancePayment"] as! NSNumber
             let tempString = temp.stringValue
             
-            self.btnPay.setTitle("PENDING AMOUNT: $\(self.dict_get_club_booking_details["clubAmount"]!)", for: .normal)
+            // total - advance
+            let total_amount = "\(self.dict_get_club_booking_details["totalAmount"]!)"
+            let advance_amount = "\(self.dict_get_club_booking_details["advancePayment"]!)"
+            let calculate_price = Double(total_amount)! - Double(advance_amount)!
+            print(calculate_price)
+            
+            self.btnPay.setTitle("PENDING AMOUNT: $\(calculate_price)", for: .normal)
             
         }
         

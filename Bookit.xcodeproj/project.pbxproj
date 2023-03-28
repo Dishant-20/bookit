@@ -122,6 +122,7 @@
 		89D471A1277B2F7B0066F5C6 /* NPEarningVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89D471A0277B2F7B0066F5C6 /* NPEarningVC.swift */; };
 		89D471A3277B2FB50066F5C6 /* NPEarningTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89D471A2277B2FB50066F5C6 /* NPEarningTableViewCell.swift */; };
 		B68E5D69F377BFDFE9D94EC3 /* Pods_Bookit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC8285E09126AECCC12F3A6 /* Pods_Bookit.framework */; };
+		B9C8F84C29D310950055023C /* customer_complete_profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C8F84B29D310950055023C /* customer_complete_profile.swift */; };
 		FCA7E735903CB4B744BC18BF /* Pods_BookitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91EB4AB36EF446A5E6824AE2 /* Pods_BookitTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -271,6 +272,7 @@
 		89D471A0277B2F7B0066F5C6 /* NPEarningVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NPEarningVC.swift; sourceTree = "<group>"; };
 		89D471A2277B2FB50066F5C6 /* NPEarningTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NPEarningTableViewCell.swift; sourceTree = "<group>"; };
 		91EB4AB36EF446A5E6824AE2 /* Pods_BookitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BookitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B9C8F84B29D310950055023C /* customer_complete_profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customer_complete_profile.swift; sourceTree = "<group>"; };
 		E595C228F298252CF84156F0 /* Pods-BookitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookitTests.debug.xcconfig"; path = "Target Support Files/Pods-BookitTests/Pods-BookitTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ECABB2DFCE77C6A727B717F3 /* Pods_Bookit_BookitUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Bookit_BookitUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -639,6 +641,7 @@
 		896FC46E276E174B00B3139E /* SignUp */ = {
 			isa = PBXGroup;
 			children = (
+				B9C8F84A29D30FF40055023C /* customer_complete_profile */,
 				896FC46F276E176400B3139E /* SignUpVC.swift */,
 				896FC4862771A96000B3139E /* SignUpTableViewCell.swift */,
 			);
@@ -935,6 +938,14 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		B9C8F84A29D30FF40055023C /* customer_complete_profile */ = {
+			isa = PBXGroup;
+			children = (
+				B9C8F84B29D310950055023C /* customer_complete_profile.swift */,
+			);
+			path = customer_complete_profile;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1196,6 +1207,7 @@
 			files = (
 				89949F62277C3FAE00DB553E /* NPManageTableViewCell.swift in Sources */,
 				188711DF27CD07A90059A5C9 /* ImagePreviewVC.swift in Sources */,
+				B9C8F84C29D310950055023C /* customer_complete_profile.swift in Sources */,
 				89CAD28F2777063800F30A41 /* BookingVC.swift in Sources */,
 				181B868527CDF64B00AC4220 /* club_edit_profile.swift in Sources */,
 				18BC776F27D780FC005515C5 /* pre_booking_history.swift in Sources */,

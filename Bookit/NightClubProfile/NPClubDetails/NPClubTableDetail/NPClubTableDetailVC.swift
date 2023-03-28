@@ -64,6 +64,9 @@ class NPClubTableDetailVC: UIViewController {
     
     var str_guest_select_final_date:String!
     
+    
+    var payment_for_apple_pay:String!
+    
     @IBOutlet weak var lbl_no_data_found:UILabel! {
         didSet {
             lbl_no_data_found.textColor = .black
@@ -870,10 +873,9 @@ print(jsonData)
     @objc func apple_pay_in_bookit(
         str_club_name:String,str_table_name:String,str_table_price:String) {
         
+            self.payment_for_apple_pay = String(str_table_price)
+            // print(self.payment_for_apple_pay as Any)
             
-//            print(str_club_name)
-//            print(str_table_price)
-
             let paymentItem = PKPaymentSummaryItem.init(label: str_club_name+"\n"+str_table_name, amount: NSDecimalNumber(value: str_table_price.toDouble()!))
         
         // for cards
@@ -900,11 +902,7 @@ print(jsonData)
             }
             paymentVC.delegate = self
             self.present(paymentVC, animated: true, completion: nil)
-            
-            
-            
-            
-            
+
         } else {
             displayDefaultAlert(title: "Error", message: "Unable to make Apple Pay transaction.")
         }
@@ -925,8 +923,9 @@ print(jsonData)
     
     
     @objc func payment_via_cwa(payment_to_cwa:String) {
-         
-        /*let myDouble = Double(payment_to_cwa)
+        ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+        
+        let myDouble = Double(payment_to_cwa)
         
         let url = URL(string: "https://cwamerchantservices.transactiongateway.com/api/transact.php")!
         var request = URLRequest(url: url)
@@ -982,7 +981,7 @@ print(jsonData)
                      print("responseString = \(responseString)")
                     
                     // send data to evs server
-                    self.book_a_table_wb()
+                    self.book_a_table_wb(advanced_payment: myDouble!)
                     //
                 } else {
                     print("unable to parse response as string")
@@ -990,12 +989,11 @@ print(jsonData)
             }
         }
 
-        task.resume()*/
+        task.resume()
         
         // delete this after uncomment
-        let myDouble = Double(payment_to_cwa)
-        
-        self.book_a_table_wb(advanced_payment: myDouble!)
+        /*let myDouble = Double(payment_to_cwa)
+        self.book_a_table_wb(advanced_payment: myDouble!)*/
         
     }
     
@@ -1050,7 +1048,7 @@ print(jsonData)
              youliked = No;
              zipCode = 11101;
          */
-         ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+         // ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
         
         
         if let person = UserDefaults.standard.value(forKey: "keyLoginFullData") as? [String:Any] {
@@ -1058,8 +1056,6 @@ print(jsonData)
 
             let x : Int = person["userId"] as! Int
             let myString = String(x)
-
-
 
             let x_2 : Int = (self.dict_save_club_info_for_apple_pay["userId"] as! Int)
             let myString_2 = String(x_2)
@@ -1072,26 +1068,6 @@ print(jsonData)
 
             let x_5 : Int = (self.dict_save_club_info_for_apple_pay["seatPrice"] as! Int)
             let myString_5 = String(x_5)
-
-            // let total_amount_minus_admin = Double(myString_5)! - Double(0)
-
-            // print(self.total_price as Any)
-
-//            var str_advance_payment_is:String!
-//
-//            if self.is_full_payment_status == "2" {
-//
-//                str_advance_payment_is = String(self.str_my_advance_payment_is)
-//
-//            } else {
-//
-//                str_advance_payment_is = "0"
-//            }
-
-            print(myString_4 as Any)
-            print(myString_5 as Any)
-
-            // let total_amount_calculate = Double(myString_4)!*Double(myString_5)!
 
             let params = customer_book_a_table(action   : "addbooking",
                                                userId       : myString,
@@ -1148,7 +1124,7 @@ print(jsonData)
 
                     } else {
                         print("no")
-                        //  ERProgressHud.sharedInstance.hide()
+                          ERProgressHud.sharedInstance.hide()
 
                         var strSuccess2 : String!
                         strSuccess2 = JSON["msg"]as Any as? String
@@ -1292,6 +1268,7 @@ print(jsonData)
          push!.str_booked_price = str_total_price_show
         self.navigationController?.pushViewController(push!, animated: true)
     }
+    
 }
 
 
@@ -1710,7 +1687,7 @@ extension NPClubTableDetailVC: UITableViewDataSource {
         print(self.str_guest_select_final_date as Any)
         
         self.view.endEditing(true)
-        ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "checking availaibility...")
+        ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "please wait...")
         
         let date = Date().today(format: "yyyy-MM-dd")
 
@@ -1999,10 +1976,11 @@ extension NPClubTableDetailVC: PKPaymentAuthorizationViewControllerDelegate {
             print(receiptBase64)
         }
         
-        displayDefaultAlert(title: "Success!", message: "The Apple Pay transaction was complete.")
+        // displayDefaultAlert(title: "Success!", message: "The Apple Pay transaction was complete.")
         
         // call webservice
-        
+        ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+        self.book_a_table_wb(advanced_payment: Double(self.payment_for_apple_pay)!)
         
         
         

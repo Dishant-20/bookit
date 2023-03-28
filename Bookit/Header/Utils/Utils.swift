@@ -13,6 +13,8 @@ import CoreLocation
  let split_payment_URL = "https://demo4.evirtualservices.net/bookit/webroot/strip_master/strip_master/splitpayment_test.php"
 
 
+// CWA PAYMENT
+let cwa_payment_link = "https://cwamerchantservices.transactiongateway.com/api/transact.php"
 
 /*
 // LIVE

@@ -553,6 +553,17 @@ struct edit_profile_for_stipe_payment_option: Encodable {
     let currentPaymentOption: String
 }
 
+struct edit_profile_for_member_information: Encodable {
+    
+    let action: String
+    let userId: String
+    let address:String
+    let countryId:String
+    let stateId:String
+    let zipCode:String
+    let city:String
+}
+
 /*
  "action"        : "chargeramount",
  "userId"        : String(myString),

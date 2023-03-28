@@ -61,6 +61,8 @@ class BookingVC: UIViewController {
         }
     }
     
+    var payment_for_apple_pay:String!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -132,9 +134,6 @@ class BookingVC: UIViewController {
     @objc func back_click_method() {
         self.navigationController?.popViewController(animated: true)
     }
-    
-    
-    
     
     // MARK: - CHECK DATES AVAILAIBLE -
     @objc func check_availaibility() {
@@ -244,14 +243,14 @@ class BookingVC: UIViewController {
                         let alert_table_price = "Table Price : $"+String(final_table_price)
                         let alert_booking_price = "\n\nBooking fees : $"+String(s_final_amount)
                         let alert_deposit = "\n\nDeposit : "+String(club_deposit_advance)+"%"
-                        let alert_pay_price = "Pay Now : $"+final_pay_to_club
+                        let alert_pay_price = "$"+final_pay_to_club
                         
                         //
                         let actionSheet = NewYorkAlertController(title: "Payment", message: alert_table_price+alert_booking_price+alert_deposit, style: .actionSheet)
                         
-                        actionSheet.addImage(UIImage(named: "apple-pay"))
+                        actionSheet.addImage(UIImage(named: "payment_1"))
                         
-                        let apple_pay = NewYorkButton(title: alert_pay_price, style: .default) { _ in
+                        let apple_pay = NewYorkButton(title: "Apple pay : "+alert_pay_price, style: .default) { _ in
                             // print("camera clicked done")
 
                             self.apple_pay_in_bookit(str_club_name: club_name,
@@ -260,9 +259,11 @@ class BookingVC: UIViewController {
                             
                          }
                         
-                        let cwd = NewYorkButton(title: alert_pay_price, style: .default) { _ in
+                        let cwd = NewYorkButton(title: "CWA : "+alert_pay_price, style: .default) { _ in
                             // print("camera clicked done")
 
+                            self.payment_via_cwa(payment_to_cwa: final_pay_to_club)
+                            
 //                            self.apple_pay_in_bookit(str_club_name: club_name,
 //                                                     str_table_name: table_name,
 //                                                     str_table_price: final_pay_to_club)
@@ -347,10 +348,11 @@ class BookingVC: UIViewController {
     @objc func apple_pay_in_bookit(
         str_club_name:String,str_table_name:String,str_table_price:String) {
         
+            //
             
-//            print(str_club_name)
-//            print(str_table_price)
-
+            //
+            self.payment_for_apple_pay = String(str_table_price)
+            
             let paymentItem = PKPaymentSummaryItem.init(label: str_club_name+"\n"+str_table_name, amount: NSDecimalNumber(value: str_table_price.toDouble()!))
         
         // for cards
@@ -378,10 +380,6 @@ class BookingVC: UIViewController {
             paymentVC.delegate = self
             self.present(paymentVC, animated: true, completion: nil)
             
-            
-            
-            
-            
         } else {
             displayDefaultAlert(title: "Error", message: "Unable to make Apple Pay transaction.")
         }
@@ -396,6 +394,347 @@ class BookingVC: UIViewController {
     }
     
     
+    @objc func book_a_table_wb(advanced_payment:Double) {
+      
+        // print(self.dict_save_club_info_for_apple_pay as Any)
+        // print(self.club_Details as Any)
+        
+        /*
+         Optional({
+             advancePercentage = 20;
+             clubTableId = 81;
+             created = "Jan 3rd, 2023, 9:58 pm";
+             description = "Five premium no cover up to 10 people ";
+             image = "https://bookitweb.com/img/uploads/table/1672801106add_table.png";
+             name = PLATINUM;
+             "profile_picture" = "https://bookitweb.com/img/uploads/users/1672801183add_club_logo.png";
+             seatPrice = 1500;
+             totalSeat = 5;
+             userAddress = "51-07 27th Street";
+             userId = 1336;
+             userName = "Sugar Daddy's Gentlemen\U2019s Club";
+         })
+         Optional({
+             AVGRating = "";
+             Fri = 0;
+             Mon = 0;
+             Sat = 0;
+             StripeStatus = "";
+             Sun = 0;
+             Thu = 0;
+             Tue = 0;
+             Userimage = "https://bookitweb.com/img/uploads/users/1672801183add_club_logo.png";
+             Wed = 0;
+             about = "Gentlemen\U2019s Club";
+             address = "51-07 27th Street";
+             banner = "https://bookitweb.com/img/uploads/users/1672801191edit_club_banner.png";
+             city = 11101;
+             closeTime = "04:00 AM";
+             contactNumber = "718-706-9600";
+             currentPaymentOption = WIRED;
+             device = "";
+             deviceToken = "";
+             email = "";
+             fullName = "Sugar Daddy's Gentlemen\U2019s Club";
+             latitude = "";
+             longitude = "";
+             openTime = "08:00 PM";
+             stripeAccountNo = "";
+             totalLiked = 0;
+             userId = 1336;
+             youliked = No;
+             zipCode = 11101;
+         */
+          
+        
+        
+        if let person = UserDefaults.standard.value(forKey: "keyLoginFullData") as? [String:Any] {
+            // print(person as Any)
+
+            let x : Int = person["userId"] as! Int
+            let myString = String(x)
+
+            let x_2 : Int = (self.dict_get_table_Details["userId"] as! Int)
+            let myString_2 = String(x_2)
+
+            let x_3 : Int = (self.dict_get_table_Details["clubTableId"] as! Int)
+            let myString_3 = String(x_3)
+
+            let x_4 : Int = (self.dict_get_table_Details["totalSeat"] as! Int)
+            let myString_4 = String(x_4)
+
+            let x_5 : Int = (self.dict_get_table_Details["seatPrice"] as! Int)
+            let myString_5 = String(x_5)
+
+            let params = customer_book_a_table(action   : "addbooking",
+                                               userId       : myString,
+                                               clubId       : myString_2,
+                                               clubTableId  : myString_3,
+                                               bookingDate  : Date.getCurrentDate(),
+                                               arrvingTime  : String("N.A."),
+                                               totalSeat    : myString_4,
+                                               seatPrice    : myString_5,
+                                               adminFee     : "0",
+                                               totalAmount  : String(myString_5),
+                                               advancePayment : "\(advanced_payment)",
+                                               fullPaymentStatus: String("2") // half payment
+            )
+
+            print(params as Any)
+
+            AF.request(APPLICATION_BASE_URL,
+                       method: .post,
+                       parameters: params,
+                       encoder: JSONParameterEncoder.default).responseJSON { response in
+                // debugPrint(response.result)
+
+                switch response.result {
+                case let .success(value):
+
+                    let JSON = value as! NSDictionary
+                    print(JSON as Any)
+
+                    var strSuccess : String!
+                    strSuccess = (JSON["status"]as Any as? String)?.lowercased()
+                    print(strSuccess as Any)
+                    if strSuccess == String("success") {
+                        print("yes")
+
+                        let x : Int = JSON["bookingId"] as! Int
+                        let myString_bid = String(x)
+
+                        //
+                        ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+                        self.update_payment_after_stripe(str_booking_id: String(myString_bid),
+                                                         str_payment_Status: "2",
+                                                         str_status_is: "yes",
+                                                         str_transaction_id: "dummy_transaction_id",
+                                                         str_total_price: "\(advanced_payment)")
+                        
+                    } else {
+                        print("no")
+                          ERProgressHud.sharedInstance.hide()
+
+                        var strSuccess2 : String!
+                        strSuccess2 = JSON["msg"]as Any as? String
+
+                        if strSuccess2 == "Your Account is Inactive. Please contact admin.!!" ||
+                            strSuccess2 == "Your Account is Inactive. Please contact admin.!" ||
+                            strSuccess2 == "Your Account is Inactive. Please contact admin." {
+
+
+                        } else {
+
+                            let alert = UIAlertController(title: String(strSuccess).uppercased(), message: String(strSuccess2), preferredStyle: .alert)
+
+                            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+
+                            self.present(alert, animated: true)
+
+                        }
+                    }
+
+                case let .failure(error):
+                    print(error)
+                    ERProgressHud.sharedInstance.hide()
+
+                    // Utils.showAlert(alerttitle: SERVER_ISSUE_TITLE, alertmessage: SERVER_ISSUE_MESSAGE, ButtonTitle: "Ok", viewController: self)
+                }
+            }
+        }
+    }
+    
+    
+    
+    @objc func update_payment_after_stripe(str_booking_id:String,
+                                           str_payment_Status:String,
+                                           str_status_is:String,
+                                           str_transaction_id:String,
+                                           str_total_price:String) {
+        
+        
+        
+//        self.view.endEditing(true)
+        
+        
+        if let person = UserDefaults.standard.value(forKey: "keyLoginFullData") as? [String:Any] {
+            // print(person as Any)
+            
+            let x : Int = person["userId"] as! Int
+            let myString = String(x)
+            
+            let params = Bookit.update_payment_after_stripe_webservice(action: "updatepayment",
+                                                     userId: String(myString),
+                                                     bookingId: String(str_booking_id),
+                                                     fullPaymentStatus: String(str_payment_Status),
+                                                     transactionId: String(str_transaction_id))
+            
+            print(params as Any)
+            
+            AF.request(APPLICATION_BASE_URL,
+                       method: .post,
+                       parameters: params,
+                       encoder: JSONParameterEncoder.default).responseJSON { response in
+                // debugPrint(response.result)
+                
+                switch response.result {
+                case let .success(value):
+                    
+                    let JSON = value as! NSDictionary
+                    print(JSON as Any)
+                    
+                    var strSuccess : String!
+                    strSuccess = (JSON["status"]as Any as? String)?.lowercased()
+                    print(strSuccess as Any)
+                    if strSuccess == String("success") {
+                        print("yes")
+                        
+                        ERProgressHud.sharedInstance.hide()
+                        
+                        if str_status_is == "yes" {
+                            
+                            self.confirm_payment(str_total_price_show: str_total_price)
+                            
+                        } else {
+                            
+                            var strSuccess2 : String!
+                            strSuccess2 = JSON["msg"]as Any as? String
+                            
+                            let alert = NewYorkAlertController(title: "Success", message: String(strSuccess2), style: .alert)
+                            
+                            alert.addImage(UIImage.gif(name: "success3"))
+                            
+                            let cancel = NewYorkButton(title: "Ok", style: .cancel) { _ in
+                                
+                                let tab_bar = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "tab_bar_controller_id") as? tab_bar_controller
+                                tab_bar?.selectedIndex = 0
+                                self.navigationController?.pushViewController(tab_bar!, animated: false)
+                                
+                            }
+                            alert.addButtons([cancel])
+                            
+                            self.present(alert, animated: true)
+                            
+                        }
+                        
+                        
+                        
+                    } else {
+                        print("no")
+                        //  ERProgressHud.sharedInstance.hide()
+                        
+                        var strSuccess2 : String!
+                        strSuccess2 = JSON["msg"]as Any as? String
+                        
+                        if strSuccess2 == "Your Account is Inactive. Please contact admin.!!" ||
+                            strSuccess2 == "Your Account is Inactive. Please contact admin.!" ||
+                            strSuccess2 == "Your Account is Inactive. Please contact admin." {
+                            
+                            
+                        } else {
+                            
+                            let alert = UIAlertController(title: String(strSuccess).uppercased(), message: String(strSuccess2), preferredStyle: .alert)
+                            
+                            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+                            
+                            self.present(alert, animated: true)
+                            
+                        }
+                    }
+                    
+                case let .failure(error):
+                    print(error)
+                    ERProgressHud.sharedInstance.hide()
+                    
+                    // Utils.showAlert(alerttitle: SERVER_ISSUE_TITLE, alertmessage: SERVER_ISSUE_MESSAGE, ButtonTitle: "Ok", viewController: self)
+                }
+            }
+        }
+        
+    }
+    
+    @objc func confirm_payment(str_total_price_show:String) {
+        
+        let push = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "BookingSuccessVC") as? BookingSuccessVC
+         push!.str_booked_price = str_total_price_show
+        self.navigationController?.pushViewController(push!, animated: true)
+    }
+    
+    // CWA
+    @objc func payment_via_cwa(payment_to_cwa:String) {
+        ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+        
+        let myDouble = Double(payment_to_cwa)
+        
+        let url = URL(string: "https://cwamerchantservices.transactiongateway.com/api/transact.php")!
+        var request = URLRequest(url: url)
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpMethod = "POST"
+        
+        let parameters: [String: Any] = [
+                                        "zip":"77777",
+                                        "country":"India",
+                                        "amount":myDouble!,// as Double,
+                                       "firstname":"Dishant",
+                                       "cvv":"746",
+                                       "city":"Delhi",
+                                       "address1":"888",
+                                       "type":"sale",
+                                       "lastname":"Rajput",
+//                                       "security_key":"6457Thfj624V5r7WUwc5v6a68Zsd6YEm",
+                                       "security_key":"rzv73u6neV6sNdWH7r22q5WGJU3a9Q6T",
+                                       "phone":"8287632340",
+                                       "state":"Delhi",
+                                       "ccexp":"0909",
+                                       "ccnumber":"4111111111111111"
+        ]
+        
+        request.httpBody = parameters.percentEncoded()
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard
+                let data = data,
+                let response = response as? HTTPURLResponse,
+                error == nil
+            else {                                                               // check for fundamental networking error
+                print("error", error ?? URLError(.badServerResponse))
+                return
+            }
+            
+            guard (200 ... 299) ~= response.statusCode else {                    // check for http errors
+                print("statusCode should be 2xx, but is \(response.statusCode)")
+                print("response = \(response)")
+                return
+            }
+            
+            // do whatever you want with the `data`, e.g.:
+            
+            do {
+                let responseObject = try JSONDecoder().decode(ResponseObject<Foo>.self, from: data)
+                print(responseObject)
+            } catch {
+                print(error) // parsing error
+                
+                if let responseString = String(data: data, encoding: .utf8) {
+                     print("responseString = \(responseString)")
+                    
+                    // send data to evs server
+                    self.book_a_table_wb(advanced_payment: myDouble!)
+                    //
+                } else {
+                    print("unable to parse response as string")
+                }
+            }
+        }
+
+        task.resume()
+        
+        // delete this after uncomment
+        /*let myDouble = Double(payment_to_cwa)
+        self.book_a_table_wb(advanced_payment: myDouble!)*/
+        
+    }
 }
 
 
@@ -683,9 +1022,11 @@ extension BookingVC: PKPaymentAuthorizationViewControllerDelegate {
             print(receiptBase64)
         }
         
-        displayDefaultAlert(title: "Success!", message: "The Apple Pay transaction was complete.")
+        // displayDefaultAlert(title: "Success!", message: "The Apple Pay transaction was complete.")
         
         // call webservice
+        ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+        self.book_a_table_wb(advanced_payment: Double(self.payment_for_apple_pay)!)
         
     }
  
