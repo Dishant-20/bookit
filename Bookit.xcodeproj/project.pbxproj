@@ -122,6 +122,7 @@
 		89D471A1277B2F7B0066F5C6 /* NPEarningVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89D471A0277B2F7B0066F5C6 /* NPEarningVC.swift */; };
 		89D471A3277B2FB50066F5C6 /* NPEarningTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89D471A2277B2FB50066F5C6 /* NPEarningTableViewCell.swift */; };
 		B68E5D69F377BFDFE9D94EC3 /* Pods_Bookit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC8285E09126AECCC12F3A6 /* Pods_Bookit.framework */; };
+		B98BDBB929D42A2400364626 /* card_payment_screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98BDBB829D42A2400364626 /* card_payment_screen.swift */; };
 		B9C8F84C29D310950055023C /* customer_complete_profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C8F84B29D310950055023C /* customer_complete_profile.swift */; };
 		FCA7E735903CB4B744BC18BF /* Pods_BookitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91EB4AB36EF446A5E6824AE2 /* Pods_BookitTests.framework */; };
 /* End PBXBuildFile section */
@@ -272,6 +273,7 @@
 		89D471A0277B2F7B0066F5C6 /* NPEarningVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NPEarningVC.swift; sourceTree = "<group>"; };
 		89D471A2277B2FB50066F5C6 /* NPEarningTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NPEarningTableViewCell.swift; sourceTree = "<group>"; };
 		91EB4AB36EF446A5E6824AE2 /* Pods_BookitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BookitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B98BDBB829D42A2400364626 /* card_payment_screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = card_payment_screen.swift; sourceTree = "<group>"; };
 		B9C8F84B29D310950055023C /* customer_complete_profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customer_complete_profile.swift; sourceTree = "<group>"; };
 		E595C228F298252CF84156F0 /* Pods-BookitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookitTests.debug.xcconfig"; path = "Target Support Files/Pods-BookitTests/Pods-BookitTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ECABB2DFCE77C6A727B717F3 /* Pods_Bookit_BookitUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Bookit_BookitUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -691,6 +693,7 @@
 		896FC4802770A10800B3139E /* NightClubProfile */ = {
 			isa = PBXGroup;
 			children = (
+				B98BDBB729D42A0E00364626 /* card_payment_screen */,
 				18D4A2A628474A6A00C03003 /* payment_options */,
 				18CC308D2828E98600A7BA5E /* club_days_off */,
 				1809F87727FD666000FBB07C /* upcoming_bookings */,
@@ -936,6 +939,14 @@
 				14890FC086A2FDB2E426FF1E /* Pods-BookitTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		B98BDBB729D42A0E00364626 /* card_payment_screen */ = {
+			isa = PBXGroup;
+			children = (
+				B98BDBB829D42A2400364626 /* card_payment_screen.swift */,
+			);
+			path = card_payment_screen;
 			sourceTree = "<group>";
 		};
 		B9C8F84A29D30FF40055023C /* customer_complete_profile */ = {
@@ -1263,6 +1274,7 @@
 				896FC434276DF48000B3139E /* SceneDelegate.swift in Sources */,
 				896FC49D277347D200B3139E /* NPClubDetailVC.swift in Sources */,
 				896FC4A7277444E100B3139E /* NPClubReviewVC.swift in Sources */,
+				B98BDBB929D42A2400364626 /* card_payment_screen.swift in Sources */,
 				18E7295C27CE58CE003ED8DA /* Custom.swift in Sources */,
 				896FC4A42773549200B3139E /* NPClubTableDetailVC.swift in Sources */,
 				188711DD27CCFF170059A5C9 /* YBTextPicker.swift in Sources */,

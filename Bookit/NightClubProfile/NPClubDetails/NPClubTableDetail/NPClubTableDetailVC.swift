@@ -10,6 +10,7 @@ import Alamofire
 import SDWebImage
 
 import PassKit
+import SwiftyJSON
 
 struct ResponseObject<T: Decodable>: Decodable {
     let form: T    // often the top level key is `data`, but in the case of https://httpbin.org, it echos the submission under the key `form`
@@ -66,6 +67,10 @@ class NPClubTableDetailVC: UIViewController {
     
     
     var payment_for_apple_pay:String!
+    
+    var txt_card_number = UITextField()
+    var txt_exp = UITextField()
+    var txt_cvv = UITextField()
     
     @IBOutlet weak var lbl_no_data_found:UILabel! {
         didSet {
@@ -298,10 +303,72 @@ print(jsonData)
         
         //
         
+        
+        UserDefaults.standard.set("", forKey: "key_save_card_details")
+        UserDefaults.standard.set(nil, forKey: "key_save_card_details")
+        
+        
+        /*
+         response=3&responsetext=CVV must be 3 or 4 digits REFID:1151386023&authcode=&transactionid=&avsresponse=&cvvresponse=&orderid=&type=sale&response_code=300
+         */
+        
+        let str = "response=3&responsetext=CVV must be 3 or 4 digits REFID:1151386023&authcode=&transactionid=&avsresponse=&cvvresponse=&orderid=&type=sale&response_code=300"
+
+        
+        var ch = Character("&")
+        var result = str.split(separator: ch)
+        print("Result : \(result)")
+        
+        print("Result : \(result.count)")
+        
+        for indexx in 0..<result.count {
+            
+            print(result)
+            print(result[0])
+            
+            var ch_2 = Character("=")
+            var result_2 = result[0].split(separator: ch_2)
+            print(result_2)
+            
+            if "\(result_2[1])" == "1" {
+                print("all details are perfect")
+                return
+            } else {
+                print("something went wrong")
+                
+                var ch_3 = Character("=")
+                var result_3 = result[1].split(separator: ch_3)
+                print(result_3)
+                
+            }
+            
+        }
+        
+        
+        
+        // let dict = convertToDictionary(text: str)
+//        print(dict as Any)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        
+//        UserDefaults.standard.set("", forKey: "key_save_card_details")
+//        UserDefaults.standard.set(nil, forKey: "key_save_card_details")
+        
+        if let payment_details = UserDefaults.standard.value(forKey: "key_save_card_details") as? [String:Any] {
+            
+            self.btnBack.isHidden = true
+            self.lblNavigationTitle.text = "please wait..."
+            
+                self.payment_via_cwa(payment_to_cwa: (payment_details["card_amount"] as! String),
+                                     get_card_number: (payment_details["card_number"] as! String),
+                                     get_card_name: (payment_details["card_name"] as! String),
+                                     get_card_cvv: (payment_details["card_cvv"] as! String),
+                                     get_card_year: (payment_details["card_year"] as! String),
+                                     get_card_month: (payment_details["card_month"] as! String))
+           
+        }
         
         self.club_table_listing_wb()
         
@@ -888,8 +955,8 @@ print(jsonData)
             let request = PKPaymentRequest()
             request.currencyCode = "USD" // 1
             request.countryCode = "US" // 2
-                // request.merchantIdentifier = "merchant.com.development.bookit" // 3
-            request.merchantIdentifier = "merchant.com.development.info.bookit" // 3
+
+                request.merchantIdentifier = merchant_id
 
             request.merchantCapabilities = PKMerchantCapability.capability3DS // 4
             request.supportedNetworks = paymentNetworks // 5
@@ -915,44 +982,54 @@ print(jsonData)
         alert.addAction(okAction)
         self.present(alert, animated: true, completion: nil)
     }
+
+    @objc func payment_via_cwa(payment_to_cwa:String,
+                               get_card_number:String,
+                               get_card_name:String,
+                               get_card_cvv:String,
+                               get_card_year:String,
+                               get_card_month:String
+                                
     
-     
-    
-    
-    
-    
-    
-    @objc func payment_via_cwa(payment_to_cwa:String) {
-        ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+    ) {
         
+         
+        
+        if let person = UserDefaults.standard.value(forKey: "keyLoginFullData") as? [String:Any] {
+            
+            DispatchQueue.main.async {
+                // send data to evs server
+                ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+            }
         let myDouble = Double(payment_to_cwa)
         
-        let url = URL(string: "https://cwamerchantservices.transactiongateway.com/api/transact.php")!
+        let url = URL(string: cwa_payment_URL)!
         var request = URLRequest(url: url)
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.httpMethod = "POST"
         
         let parameters: [String: Any] = [
-                                        "zip":"77777",
-                                        "country":"India",
-                                        "amount":myDouble!,// as Double,
-                                       "firstname":"Dishant",
-                                       "cvv":"746",
-                                       "city":"Delhi",
-                                       "address1":"888",
-                                       "type":"sale",
-                                       "lastname":"Rajput",
-//                                       "security_key":"6457Thfj624V5r7WUwc5v6a68Zsd6YEm",
-                                       "security_key":"rzv73u6neV6sNdWH7r22q5WGJU3a9Q6T",
-                                       "phone":"8287632340",
-                                       "state":"Delhi",
-                                       "ccexp":"0909",
-                                       "ccnumber":"4111111111111111"
+            "zip"       : (person["zipCode"] as! String),
+            "country"   : (person["countryId"] as! String),
+            "amount"    : myDouble!,
+            "firstname" : String(get_card_name),
+            "cvv"       : String(get_card_cvv),
+            "city"      : (person["city"] as! String),
+            "address1"  : (person["address"] as! String),
+            "type"      : "sale",
+            "lastname"  : String(get_card_name),
+            "security_key"  : cwa_payment_api_key,
+            "phone"     : (person["contactNumber"] as! String),
+            "state"     : (person["stateId"] as! String),
+            "ccexp"     : String(get_card_month)+String(get_card_year),
+            "ccnumber"  : String(get_card_number),
         ]
         
+            print(parameters as Any)
+            
         request.httpBody = parameters.percentEncoded()
-
+        
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard
                 let data = data,
@@ -972,29 +1049,81 @@ print(jsonData)
             // do whatever you want with the `data`, e.g.:
             
             do {
+                
                 let responseObject = try JSONDecoder().decode(ResponseObject<Foo>.self, from: data)
                 print(responseObject)
+                
+                // let json = JSON.init(parseJSON: "\(responseObject)")//parse("\(responseString)")
+                // print(json)
+                
             } catch {
                 print(error) // parsing error
                 
                 if let responseString = String(data: data, encoding: .utf8) {
-                     print("responseString = \(responseString)")
+                    print("responseString = \(responseString)")
+                    print(type(of: "\(responseString)"))
                     
-                    // send data to evs server
-                    self.book_a_table_wb(advanced_payment: myDouble!)
+                    let ch = Character("&")
+                    let result = "\(responseString)".split(separator: ch)
+                    
+                    for _ in 0..<result.count {
+                        
+                        print(result)
+                        print(result[0])
+                        
+                        let ch_2 = Character("=")
+                        var result_2 = result[0].split(separator: ch_2)
+                        print(result_2)
+                        
+                        if "\(result_2[1])" == "1" {
+                            print("all details are perfect")
+                            
+                            DispatchQueue.main.async {
+                                // send data to evs server
+                                
+                                ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+                                self.book_a_table_wb(advanced_payment: myDouble!)
+                            }
+                            
+                            
+                            return
+                        } else {
+                            print("something went wrong")
+                            
+                            let ch_3 = Character("=")
+                            let result_3 = result[1].split(separator: ch_3)
+                            print(result_3)
+                            
+                            DispatchQueue.main.async {
+                                
+                                let alert = UIAlertController(title: String("Alert").uppercased(), message: "\(result_3[1])", preferredStyle: .alert)
+                                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+                                self.present(alert, animated: true)
+                                
+                                    }
+                            
+                            
+                            
+                            return
+                            
+                        }
+                        
+                    }
+                    
+                    
                     //
                 } else {
                     print("unable to parse response as string")
                 }
             }
         }
-
+        
         task.resume()
         
         // delete this after uncomment
         /*let myDouble = Double(payment_to_cwa)
-        self.book_a_table_wb(advanced_payment: myDouble!)*/
-        
+         self.book_a_table_wb(advanced_payment: myDouble!)*/
+    }
     }
     
     @objc func book_a_table_wb(advanced_payment:Double) {
@@ -1048,7 +1177,8 @@ print(jsonData)
              youliked = No;
              zipCode = 11101;
          */
-         // ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
+         //
+        
         
         
         if let person = UserDefaults.standard.value(forKey: "keyLoginFullData") as? [String:Any] {
@@ -1831,10 +1961,8 @@ extension NPClubTableDetailVC: UITableViewDataSource {
                          }
                         
                         let cwd_payment = NewYorkButton(title: "CWA"+alert_pay_price, style: .default) { _ in
-                            // print("camera clicked done")
-
-                             
-                            self.payment_via_cwa(payment_to_cwa: final_pay_to_club)
+                            
+                            self.open_card_popup(final_payment_for_card_payment: final_pay_to_club)
                             
                          }
                                                 
@@ -1843,59 +1971,7 @@ extension NPClubTableDetailVC: UITableViewDataSource {
                         actionSheet.addButtons([apple_pay,cwd_payment, cancel])
                         
                         self.present(actionSheet, animated: true)
-                        
-                        
-                        
-                        
-//                        let alert = UIAlertController(title: String("Payment "), message: String("\nTable Price : "+String(final_table_price)+"\n\nBooking fees"+String(s_final_amount)), preferredStyle: .alert)
-//
-//                        alert.addAction(UIAlertAction(title: "Pay Now", style: .default, handler: {
-//
-//                        }))
-//                        alert.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
-//
-//                        self.present(alert, animated: true)
-                        
-                        
-                        
-//                        cell.lbl_booking_fee.text = "Booking fee : $"+String(s_final_amount)
-                        
-//                        self.str_booking_fees = String(s_final_amount)
-                        
-                        //
-                        
-                        /*if (self.club_Details["currentPaymentOption"] as! String) == "WIRED" {
-                            
-                            let club_name = (self.club_Details["fullName"] as! String)
-                            
-                            let push = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "PaymentVC") as? PaymentVC
-                            
-                            push!.dict_get_table_Details = dict_of_that_club
-                            push!.get_club_name = club_name
-                            push!.dict_get_club_details = self.club_Details
-                            // push!.str_schedule_time = selectedDate.dateString("hh:mm a")
-                            push!.my_payment_server_status = "yes"
-                            
-                            self.navigationController?.pushViewController(push!, animated: true)
-                            
-                        } else {
-                            
-                            let club_name = (self.club_Details["fullName"] as! String)
-                            
-                            let push = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "payment_stripe_id") as? payment_stripe
-                            
-                            push!.dict_get_table_Details = dict_of_that_club
-                            push!.get_club_name = club_name
-                            push!.dict_get_club_details = self.club_Details
-                            // push!.str_schedule_time = selectedDate.dateString("hh:mm a")
-                            push!.my_payment_server_status = "yes"
-                            
-                            self.navigationController?.pushViewController(push!, animated: true)
-                            
-                        }*/
-                        
-                        
-                        
+                          
                     }
                     
                     
@@ -1924,6 +2000,16 @@ extension NPClubTableDetailVC: UITableViewDataSource {
         // }
     }
     
+    @objc func open_card_popup(final_payment_for_card_payment:String) {
+        
+        let settingsVCId = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "card_payment_screen_id") as? card_payment_screen
+        
+        settingsVCId!.str_price = String(final_payment_for_card_payment)
+        
+        self.navigationController?.pushViewController(settingsVCId!, animated: true)
+        
+    }
+    
     @objc func push_when_time_select_successfully(get_my_dict:NSDictionary) {
         
         
@@ -1936,9 +2022,6 @@ extension NPClubTableDetailVC: UITableViewDataSource {
         self.navigationController?.pushViewController(settingsVCId!, animated: true)
     }
 
-    
-    
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
@@ -1982,13 +2065,10 @@ extension NPClubTableDetailVC: PKPaymentAuthorizationViewControllerDelegate {
         ERProgressHud.sharedInstance.showDarkBackgroundView(withTitle: "Please wait...")
         self.book_a_table_wb(advanced_payment: Double(self.payment_for_apple_pay)!)
         
-        
-        
     }
     
  
 }
-
 
 extension String {
     func toDouble() -> Double? {
@@ -2019,3 +2099,26 @@ extension CharacterSet {
         return allowed
     }()
 }
+
+
+extension String {
+    func toJSON() -> Any? {
+        guard let data = self.data(using: .utf8, allowLossyConversion: false) else { return nil }
+        return try? JSONSerialization.jsonObject(with: data, options: .mutableContainers)
+    }
+}
+
+
+func convertToDictionary(text: String) -> [String: Any]? {
+    if let data = text.data(using: .utf8) {
+        do {
+            return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    return nil
+}
+
+
+ 

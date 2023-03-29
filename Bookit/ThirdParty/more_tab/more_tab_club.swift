@@ -460,7 +460,7 @@ extension more_tab_club: UITableViewDataSource , UITableViewDelegate {
         if indexPath.row == 0 {
             return 300
         } else if indexPath.row == 3 {
-            return 80
+            return 0
         } else if indexPath.row == 5 { // edit bank
             return 80
         }  else if indexPath.row == 6 { // cashout

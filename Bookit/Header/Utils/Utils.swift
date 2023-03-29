@@ -5,7 +5,11 @@ import CoreLocation
 //  let APPLICATION_BASE_URL = "https://demo4.evirtualservices.net/bookit/services/index"
   let APPLICATION_BASE_URL = "https://bookitweb.com/services/index"
 
+let cwa_payment_URL = "https://cwamerchantservices.transactiongateway.com/api/transact.php"
+let cwa_payment_api_key = "rzv73u6neV6sNdWH7r22q5WGJU3a9Q6T"
 
+// apple pay
+let merchant_id = "merchant.com.development.info.bookit"
 
 // TEST
  let stripe_payment_update = "https://demo4.evirtualservices.net/bookit/webroot/strip_master/strip_master/charge_test.php"

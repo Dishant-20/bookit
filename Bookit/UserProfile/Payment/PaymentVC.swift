@@ -1221,13 +1221,6 @@ extension PaymentVC:UITableViewDelegate,UITableViewDataSource{
             
             
             
-            
-            
-            
-            
-            
-            
-            
             // total number of seats
             // cell.lbl_total_number_of_Seats.text = "Table Capacity :"+"\(self.dict_get_table_Details["totalSeat"]!) seats"
             
